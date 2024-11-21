@@ -7,11 +7,11 @@ from .validadores import validacion_numeros, Validacion_letras, validacion_espec
 # Create your models here.
 class Clientes(models.Model):
     cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators= [MinLengthValidator(10), validacion_numeros])
-    nombre = models.CharField(max_length=50, blank=False, verbose_name= 'Nombre del cliente : ', validators=[validacion_especial])
-    apellido = models.CharField(max_length=50, blank=False)
-    telefono = models.CharField(max_length=10)
-    email = models.EmailField(unique=True)
-    direccion = models.TextField()
+    nombre = models.CharField(max_length=50, blank=False, verbose_name= 'Nombre del cliente : ', validators=[Validacion_letras])
+    apellido = models.CharField(max_length=50, blank=False,validators=[Validacion_letras])
+    telefono = models.CharField(max_length=10, validators=[validacion_numeros])
+    email = models.EmailField(unique=True,validators=[validacion_especial3])
+    direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     Fecha_nacimiento = models.DateField()
 
@@ -25,12 +25,12 @@ class Clientes(models.Model):
 
 
 class Productos(models.Model):
-    codigo = models.CharField(primary_key=True, max_length=10, unique=True)
-    nombre = models.CharField(max_length=50, blank=False, verbose_name=' Nombre del producto : ') 
-    marca = models.CharField(max_length=50, unique=True)
-    caracteristicas_categoria = models.CharField(max_length=100, choices= CATEGORIAS)
-    precio = models.DecimalField(max_digits=10, decimal_places=2, help_text='ingresa valores con decimales', verbose_name='Precio del producto : ')
-    cantidad_stock = models.IntegerField(verbose_name='Cantidad en stock : ')
+    codigo = models.CharField(primary_key=True, max_length=10, unique=True, validators=[validacion_numeros])
+    nombre = models.CharField(max_length=50, blank=False, verbose_name=' Nombre del producto : ', validators=[Validacion_letras]) 
+    marca = models.CharField(max_length=50, unique=True, validators=[Validacion_letras])
+    caracteristicas_categoria = models.CharField(max_length=100, choices= CATEGORIAS, validators=[validacion_especial3])
+    precio = models.DecimalField(max_digits=10, decimal_places=2, help_text='ingresa valores con decimales', verbose_name='Precio del producto : ', validators=[validacion_numeros])
+    cantidad_stock = models.IntegerField(verbose_name='Cantidad en stock : ', validators=[validacion_numeros])
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
     fecha_elaboracion = models.DateField()
     fecha_vencimiento = models.DateField()
@@ -48,11 +48,11 @@ class Productos(models.Model):
         db_table = 'Productos'
 
 class Empresas (models.Model):
-    ruc = models.CharField(primary_key=True, max_length=13, unique=True)
-    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre de la empresa : ')
-    direccion = models.TextField()
-    telefono = models.CharField(max_length=10)
-    email = models.EmailField(unique=True)
+    ruc = models.CharField(primary_key=True, max_length=13, unique=True, validators=[validacion_numeros])
+    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre de la empresa : ', validators=[Validacion_letras])
+    direccion = models.TextField(validators=[validacion_especial3])
+    telefono = models.CharField(max_length=10, validators=[validacion_numeros])
+    email = models.EmailField(unique=True, validators=[validacion_especial3])
 
     def __str__(self):
         return f"{self.nombre} "
@@ -63,10 +63,10 @@ class Empresas (models.Model):
 
 class Proveedores (models.Model):
     cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators=[MinLengthValidator(10),validacion_numeros])
-    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del proveedor : ')
-    apellido = models.CharField(max_length=50, blank=False)
-    telefono = models.CharField(max_length=10)
-    email = models.EmailField(unique=True)
+    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del proveedor : ', validators=[Validacion_letras])
+    apellido = models.CharField(max_length=50, blank=False, validators=[Validacion_letras])
+    telefono = models.CharField(max_length=10, validators=[validacion_numeros])
+    email = models.EmailField(unique=True, validators=[validacion_especial3])
     empresa = models.ForeignKey(Empresas, on_delete= models.CASCADE)
     def __str__(self):
         return f"{self.nombre} ' ' {self.apellido} "
@@ -76,12 +76,12 @@ class Proveedores (models.Model):
         db_table = 'Proveedores'
 
 class Empleados (models.Model):
-    cedula = models.CharField(primary_key=True, max_length=10, unique=True, verbose_name= 'Cedula del Empleado :')
-    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del Empleado : ')
-    apellido = models.CharField(max_length=50, blank=False)
-    telefono = models.CharField(max_length=10)
-    email = models.EmailField(unique=True)
-    direccion = models.TextField()
+    cedula = models.CharField(primary_key=True, max_length=10, unique=True, verbose_name= 'Cedula del Empleado :', validators=[validacion_numeros])
+    nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del Empleado : ', validators=[Validacion_letras])
+    apellido = models.CharField(max_length=50, blank=False, validators=[Validacion_letras])
+    telefono = models.CharField(max_length=10, validators=[validacion_numeros])
+    email = models.EmailField(unique=True, validators=[validacion_especial3])
+    direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_nacimiento = models.DateField()
     def __str__(self):

@@ -23,8 +23,9 @@ validacion_especial2 = RegexValidator(
 
 )
 
-#validacion numeros, letras y espacios y caracteres espcailes
+#validacion numeros, letras y espacios y caracteres especiales
 validacion_especial3 = RegexValidator(
     regex= r'^[a-zA-Z0-9,-ó\s]+$', #para establecer la expresion regular o cadena permitidos 
     message= 'el campo solo debe contener letras y espacios'
 )
+
