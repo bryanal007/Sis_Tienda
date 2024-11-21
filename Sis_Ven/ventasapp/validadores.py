@@ -1,9 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator #para hacer validaciones especiales letras y espacio (o expresiones regulares)
-from datetime import timedelta
 from datetime import date
+from dateutil.relativedelta import relativedelta
 def validacion_numeros(value):
-    if not value.isdigit():
+    if isinstance(value, str):
+      if not value.isdigit():
         raise ValidationError("El valor debe contener solo números") #raise funciona como como un print para devolver un mensajhe en caso de que no se cumpla la condicion
     
 def Validacion_letras(value):
@@ -31,15 +32,20 @@ validacion_especial3 = RegexValidator(
     message= 'el campo solo debe contener letras y espacios'
 )
 
-def validacion_edad_maxima(fecha_nacimiento):
-    edad = (date.today() - fecha_nacimiento).days // 365
-    if edad > 60:
-        raise ValidationError("La edad máxima para el registro es de 60 años.")
+def validar_fecha_nacimiento(value):
+    hoy = date.today()
+    edad_maxima = 60
+    fecha_limite = date(hoy.year - edad_maxima, hoy.month, hoy.day)
+    if value < fecha_limite:
+        raise ValidationError(f"La fecha de nacimiento no puede indicar más de {edad_maxima} años de antigüedad.")
 
-def validacion_fechas_creacion_vencimiento(fecha_creacion, fecha_vencimiento):
-    if fecha_creacion == fecha_vencimiento:
-        raise ValidationError("La fecha de creación no puede ser igual a la fecha de vencimiento.")
-    
-def validacion_fecha_vencimiento(fecha_creacion, fecha_vencimiento):
-    if fecha_vencimiento > fecha_creacion + timedelta(days=5*365):
-        raise ValidationError("La fecha de vencimiento no debe ser mayor a 5 años desde la fecha de creación.")
+def validar_fecha_vencimiento(fecha_elaboracion, fecha_vencimiento):
+    if fecha_elaboracion is None or fecha_vencimiento is None:
+        raise ValidationError("Ambas fechas (elaboración y vencimiento) son obligatorias.")
+
+    if fecha_vencimiento <= fecha_elaboracion:
+        raise ValidationError("La fecha de vencimiento debe ser posterior a la fecha de elaboración.")
+
+    fecha_limite = fecha_elaboracion + relativedelta(years=5)
+    if fecha_vencimiento > fecha_limite:
+        raise ValidationError("La fecha de vencimiento no puede ser más de 5 años después de la fecha de elaboración.")

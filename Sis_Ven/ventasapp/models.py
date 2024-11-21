@@ -2,22 +2,18 @@ from django.db import models
 from .choices import CATEGORIAS
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator, MaxLengthValidator, MinLengthValidator
-from .validadores import validacion_numeros, Validacion_letras, validacion_especial,validacion_especial2,validacion_especial3,validacion_edad_maxima,validacion_fecha_vencimiento,validacion_fechas_creacion_vencimiento
+from .validadores import validacion_numeros, Validacion_letras, validacion_especial,validacion_especial2,validacion_especial3, validar_fecha_nacimiento, validar_fecha_vencimiento
 
 # Create your models here.
 class Clientes(models.Model):
-    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators= [MinLengthValidator(10), validacion_numeros])
+    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators= [MaxLengthValidator(10), validacion_numeros])
     nombre = models.CharField(max_length=50, blank=False, verbose_name= 'Nombre del cliente : ', validators=[Validacion_letras])
     apellido = models.CharField(max_length=50, blank=False,validators=[Validacion_letras])
     telefono = models.CharField(max_length=10, validators=[validacion_numeros])
     email = models.EmailField(unique=True,validators=[validacion_especial3])
     direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    Fecha_nacimiento = models.DateField()
-
-    def clean(self):
-        # Validación de edad máxima al registrar cliente
-        validacion_edad_maxima(self.fecha_nacimiento)
+    Fecha_nacimiento = models.DateField(validators=[validar_fecha_nacimiento])
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} "
@@ -27,26 +23,20 @@ class Clientes(models.Model):
         db_table = 'Clientes'
 
 
-
 class Productos(models.Model):
-    codigo = models.CharField(primary_key=True, max_length=10, unique=True, validators=[validacion_numeros])
+    codigo = models.CharField(primary_key=True, max_length=10, unique=True, validators=[MaxLengthValidator(10),validacion_numeros])
     nombre = models.CharField(max_length=50, blank=False, verbose_name=' Nombre del producto : ', validators=[Validacion_letras]) 
     marca = models.CharField(max_length=50, unique=True, validators=[Validacion_letras])
     caracteristicas_categoria = models.CharField(max_length=100, choices= CATEGORIAS, validators=[validacion_especial3])
     precio = models.DecimalField(max_digits=10, decimal_places=2, help_text='ingresa valores con decimales', verbose_name='Precio del producto : ', validators=[validacion_numeros])
     cantidad_stock = models.IntegerField(verbose_name='Cantidad en stock : ', validators=[validacion_numeros])
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
-    fecha_elaboracion = models.DateField()
+    fecha_elaboracion = models.DateField(blank=True)
     fecha_vencimiento = models.DateField(default='2024-01-01')
     
     def clean(self):
-        # Validación de fechas de creación y vencimiento del producto
+        validar_fecha_vencimiento(self.fecha_elaboracion,self.fecha_vencimiento)
 
-        validacion_fechas_creacion_vencimiento(self.fecha_elaboracion, self.fecha_vencimiento)
-        validacion_fecha_vencimiento(self.fecha_elaboracion, self.fecha_vencimiento)
-        
-    #creamos una funncion para actualizar el stock
-    #pasando como parametro la cantidad y guardando los cambios con save
 
     def actualizar_stock (self, cantidad):
         self.cantidad_stock -= cantidad # -= es una forma de operar (parecido a los contadores) siempre y cuadno sea una sola operacion contador = contador + 1
@@ -74,7 +64,7 @@ class Empresas (models.Model):
         db_table = 'Empresas'
 
 class Proveedores (models.Model):
-    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators=[MinLengthValidator(10),validacion_numeros])
+    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators=[MaxLengthValidator(10),validacion_numeros])
     nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del proveedor : ', validators=[Validacion_letras])
     apellido = models.CharField(max_length=50, blank=False, validators=[Validacion_letras])
     telefono = models.CharField(max_length=10, validators=[validacion_numeros])
@@ -95,11 +85,9 @@ class Empleados (models.Model):
     email = models.EmailField(unique=True, validators=[validacion_especial3])
     direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_nacimiento = models.DateField()
+    fecha_nacimiento = models.DateField(validators=[validar_fecha_nacimiento])
 
-    def clean(self):
-        # Validación de edad máxima al registrar cliente
-        validacion_edad_maxima(self.fecha_nacimiento)
+
     def __str__(self):
         return f"{self.nombre} ' ' {self.apellido} "
     class Meta:
