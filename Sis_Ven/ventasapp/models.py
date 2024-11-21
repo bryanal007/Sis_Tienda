@@ -1,12 +1,13 @@
 from django.db import models
 from .choices import CATEGORIAS
 from decimal import Decimal
-
+from django.core.validators import MinValueValidator, MaxValueValidator, MaxLengthValidator, MinLengthValidator
+from .validadores import validacion_numeros, Validacion_letras, validacion_especial,validacion_especial2,validacion_especial3
 
 # Create your models here.
 class Clientes(models.Model):
-    cedula = models.CharField(primary_key=True, max_length=10, unique=True)
-    nombre = models.CharField(max_length=50, blank=False, verbose_name= 'Nombre del cliente : ')
+    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators= [MinLengthValidator(10), validacion_numeros])
+    nombre = models.CharField(max_length=50, blank=False, verbose_name= 'Nombre del cliente : ', validators=[validacion_especial])
     apellido = models.CharField(max_length=50, blank=False)
     telefono = models.CharField(max_length=10)
     email = models.EmailField(unique=True)
@@ -61,7 +62,7 @@ class Empresas (models.Model):
         db_table = 'Empresas'
 
 class Proveedores (models.Model):
-    cedula = models.CharField(primary_key=True, max_length=10, unique=True)
+    cedula = models.CharField(primary_key=True, max_length=10, unique=True, validators=[MinLengthValidator(10),validacion_numeros])
     nombre = models.CharField(max_length=50, blank=False, verbose_name='Nombre del proveedor : ')
     apellido = models.CharField(max_length=50, blank=False)
     telefono = models.CharField(max_length=10)
