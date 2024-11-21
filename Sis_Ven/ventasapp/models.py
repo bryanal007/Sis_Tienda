@@ -2,7 +2,7 @@ from django.db import models
 from .choices import CATEGORIAS
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator, MaxLengthValidator, MinLengthValidator
-from .validadores import validacion_numeros, Validacion_letras, validacion_especial,validacion_especial2,validacion_especial3
+from .validadores import validacion_numeros, Validacion_letras, validacion_especial,validacion_especial2,validacion_especial3,validacion_edad_maxima,validacion_fecha_vencimiento,validacion_fechas_creacion_vencimiento
 
 # Create your models here.
 class Clientes(models.Model):
@@ -14,6 +14,10 @@ class Clientes(models.Model):
     direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     Fecha_nacimiento = models.DateField()
+
+    def clean(self):
+        # Validación de edad máxima al registrar cliente
+        validacion_edad_maxima(self.fecha_nacimiento)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} "
@@ -33,9 +37,17 @@ class Productos(models.Model):
     cantidad_stock = models.IntegerField(verbose_name='Cantidad en stock : ', validators=[validacion_numeros])
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
     fecha_elaboracion = models.DateField()
-    fecha_vencimiento = models.DateField()
+    fecha_vencimiento = models.DateField(default='2024-01-01')
+    
+    def clean(self):
+        # Validación de fechas de creación y vencimiento del producto
+
+        validacion_fechas_creacion_vencimiento(self.fecha_elaboracion, self.fecha_vencimiento)
+        validacion_fecha_vencimiento(self.fecha_elaboracion, self.fecha_vencimiento)
+        
     #creamos una funncion para actualizar el stock
     #pasando como parametro la cantidad y guardando los cambios con save
+
     def actualizar_stock (self, cantidad):
         self.cantidad_stock -= cantidad # -= es una forma de operar (parecido a los contadores) siempre y cuadno sea una sola operacion contador = contador + 1
         self.save()
@@ -84,6 +96,10 @@ class Empleados (models.Model):
     direccion = models.TextField(validators=[validacion_especial3])
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_nacimiento = models.DateField()
+
+    def clean(self):
+        # Validación de edad máxima al registrar cliente
+        validacion_edad_maxima(self.fecha_nacimiento)
     def __str__(self):
         return f"{self.nombre} ' ' {self.apellido} "
     class Meta:
