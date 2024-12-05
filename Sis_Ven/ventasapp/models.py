@@ -118,3 +118,30 @@ class Factura(models.Model):
         verbose_name = 'Factura'
         verbose_name_plural = 'Facturas'
         db_table = 'Facturas'
+<<<<<<< Updated upstream
+=======
+
+class Factura(models.Model):#+
+    # ... other fields ...#+
+#+
+    def save(self, *args, **kwargs):#+
+        """#+
+        Sobrescribe el método save para calcular valores automáticamente.#+
+#+
+        Parámetros:#+
+        - *args: argumentos variables posicionales.#+
+        - **kwargs: argumentos variables de palabras clave.#+
+#+
+        Calcula el subtotal, el iva, y el total de la factura, y actualiza la cantidad de stock del producto.#+
+        Llama al método save del padre (models.Model) para guardar los cambios en la base de datos.#+
+        """#+
+        self.subtotal = self.cantidad * self.producto.precio#+
+        self.iva = self.subtotal * Decimal(0.15)#+
+        self.total = self.subtotal + self.iva#+
+        self.producto.cantidad_stock = int(self.producto.cantidad_stock) - int(self.cantidad)#+
+        self.producto.actualizar_stock(self.cantidad)#+
+        super().save(*args, **kwargs)#+
+#+
+    # ... other methods ...#+
+# {"conversationId":"5a73b66f-cb40-4d70-9823-fc9fd3e5a3c3","source":"instruct"}
+>>>>>>> Stashed changes
